@@ -1,0 +1,20 @@
+# Directories
+/.git
+/build
+/dependencies/glew
+/dependencies/glfw
+/dependencies/glm
+
+# Files
+*.mkv
+*.exe
+*.aux
+*.log
+*.synctex.gz
+*.zip
+*.cache
+
+# Emacs specific files
+*.*~
+*.*#
+*.#*
