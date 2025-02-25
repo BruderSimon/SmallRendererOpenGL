@@ -1,0 +1,35 @@
+* Overview
+A small and simple renderer written in C++ and OpenGL.
+
+** Dependencies
+- GLFW 3.4
+- GLM 1.0.1
+- GLEW 2.2.0
+
+** Buidling
+CMake is used as build tool, and thus is required.
+
+CMake takes care of all dependencies with it's `FetchContent` feature,
+you just have to make sure you got at least CMake version 3.2.
+
+#+begin_src sh
+  cmake -S . -B build/
+#+end_src
+#+begin_src sh
+  cmake --build build/
+#+end_src
+
+** Running
+The Executable needs acces to the shaders to render the Object. The
+Shaders need to be stored in a directory called shader. This directory
+should be located in the same place where the executeable is stored.
+
+If you compiled the programm sucessfully, cmake should have copied the
+executable in to the root directory of the project, where everything
+is setup correctly. Then you just need to execute the file and pass
+the path to an `.obj` as parameter.
+
+On Windows
+#+begin_src sh
+SmallRendererOpenGL.exe \path\to\object.obj
+#+end_src
