@@ -6,6 +6,7 @@
 #include <GLFW/glfw3.h>
 
 #include "common/tiny_obj_loader.h"
+#include "sceneobject.h"
 
 #include<vector>
 #include<string>
@@ -20,29 +21,21 @@ class SmallRenderer{
   const int m_height;
 
   GLuint m_shaderProgram;
-  GLuint m_vao;          // Vertex Array Object
-  size_t m_numIndices;   // Number of indices for drawing
-  GLuint m_vertexBuffer;
-  GLuint m_normalBuffer;
-  GLuint m_elementBuffer;
-  GLuint m_textureID;
-  GLuint m_uvBuffer;
 
   glm::vec2 m_lastMousePos;
   glm::mat4 m_modelRotation;
   bool m_mousePressed;
-  std::vector<tinyobj::material_t> m_materials;
-  std::map<std::string, GLuint> m_textures;
+
+  std::vector<SceneObject> m_sceneObjects;
   
 public:
  SmallRenderer(const int width, const int height) :
    m_width{width}, m_height{height},
    m_mousePressed{false}, m_modelRotation{glm::mat4(1.0f)} {}
   ~SmallRenderer(){cleanUp();};
-  void init(std::string& model, std::string mtl);
+  void init(std::string &model, std::string mtl);
+  void loadScene(std::string& path);
   void run();
-  void loadModel(std::string& path, std::string mtlPath);
-  void loadTextureFromFile(const std::string& filename, GLuint textureID);
   void render();
   void initShader();
   void cleanUp();

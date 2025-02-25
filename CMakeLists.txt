@@ -96,6 +96,7 @@ set(ALL_LIBS
 
 add_executable(SmallRendererOpenGL
   src/smallrender.cpp
+  src/sceneobject.cpp
   src/main.cpp
   
   src/common/shader.cpp
