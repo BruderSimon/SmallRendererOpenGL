@@ -7,6 +7,7 @@
 
 #include "common/tiny_obj_loader.h"
 #include "sceneobject.h"
+#include "camera.h"
 
 #include<vector>
 #include<string>
@@ -22,16 +23,16 @@ class SmallRenderer{
 
   GLuint m_shaderProgram;
 
-  glm::vec2 m_lastMousePos;
-  glm::mat4 m_modelRotation;
-  bool m_mousePressed;
+  Camera m_camera;
 
+  bool m_mouseMiddlePressed; // Track if the middle mouse button is pressed
+  glm::vec2 m_lastMousePos; // Store the last mouse position for rotation
+  
   std::vector<SceneObject> m_sceneObjects;
   
 public:
  SmallRenderer(const int width, const int height) :
-   m_width{width}, m_height{height},
-   m_mousePressed{false}, m_modelRotation{glm::mat4(1.0f)} {}
+   m_width{width}, m_height{height}, m_mouseMiddlePressed{false} {}
   ~SmallRenderer(){cleanUp();};
   void init(std::string &model, std::string mtl);
   void loadScene(std::string& path);

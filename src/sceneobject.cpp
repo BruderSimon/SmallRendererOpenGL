@@ -8,7 +8,7 @@
 #include <iostream>
 
 void SceneObject::loadObject(std::string& path, std::string& mtlPath) {
-
+  loadModel(path);
   
 }
 
