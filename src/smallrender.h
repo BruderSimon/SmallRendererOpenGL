@@ -13,13 +13,13 @@
 #include<string>
 
 class SmallRenderer{
- private:
+private:
   void initWindow();
   void checkGLError(const char* operation);
   
   GLFWwindow* m_window;
-  const int m_width;
-  const int m_height;
+  int m_width;
+  int m_height;
 
   GLuint m_shaderProgram;
 
@@ -31,8 +31,8 @@ class SmallRenderer{
   std::vector<SceneObject> m_sceneObjects;
   
 public:
- SmallRenderer(const int width, const int height) :
-   m_width{width}, m_height{height}, m_mouseMiddlePressed{false} {}
+  SmallRenderer(const int width, const int height) :
+    m_width{width}, m_height{height}, m_mouseMiddlePressed{false} {}
   ~SmallRenderer(){cleanUp();};
   void init(std::string &model, std::string mtl);
   void loadScene(std::string& path);
@@ -43,6 +43,7 @@ public:
 
   static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
   static void cursorPosCallback(GLFWwindow* window, double xpos, double ypos);
+  static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 };
 
 #endif

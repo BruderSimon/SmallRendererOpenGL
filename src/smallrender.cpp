@@ -47,6 +47,8 @@ void SmallRenderer::initWindow(){
   glfwSetCursorPosCallback(m_window, cursorPosCallback);
   glfwSetWindowUserPointer(m_window, this);
 
+  // Window Resize callback
+  glfwSetFramebufferSizeCallback(m_window, framebuffer_size_callback);
 
   glEnable(GL_DEPTH_TEST);
   // Accept fragment if it closer to the camera than the former one
@@ -62,9 +64,6 @@ void SmallRenderer::run(){
   double lastTime = glfwGetTime();
   while(glfwGetKey(m_window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
 	glfwWindowShouldClose(m_window) == 0 ){
-    // Clear the screen
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     // Calculate delta time
     double currentTime = glfwGetTime();
     float deltaTime = static_cast<float>(currentTime - lastTime);
@@ -84,17 +83,17 @@ void SmallRenderer::run(){
     if (glfwGetKey(m_window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
       m_camera.processKeyboard(GLFW_KEY_LEFT_CONTROL, deltaTime);
 
-    
+    //Render Scene
     render();
-    // Swap buffers
-    glfwSwapBuffers(m_window);
-    glfwPollEvents();
   }
   cleanUp();
 } 
 
 
 void SmallRenderer::render() {
+  // Clear the screen
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
   glUseProgram(m_shaderProgram);
   for (const auto& obj : m_sceneObjects) {
     glBindVertexArray(obj.vao);
@@ -146,6 +145,9 @@ void SmallRenderer::render() {
     glDrawElements(GL_TRIANGLES, obj.numIndices, GL_UNSIGNED_INT, 0);
     checkGLError("glDrawElements");
   }
+  // Swap buffers
+  glfwSwapBuffers(m_window);
+  glfwPollEvents();
 }
 
 void SmallRenderer::initShader(){
@@ -176,28 +178,39 @@ void SmallRenderer::checkGLError(const char* operation){
 
 // Mouse button callback
 void SmallRenderer::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
-    SmallRenderer* renderer = static_cast<SmallRenderer*>(glfwGetWindowUserPointer(window));
-    if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
-        if (action == GLFW_PRESS) {
-            renderer->m_mouseMiddlePressed = true;
-            double xpos, ypos;
-            glfwGetCursorPos(window, &xpos, &ypos);
-            renderer->m_lastMousePos = glm::vec2(xpos, ypos);
-        } else if (action == GLFW_RELEASE) {
-            renderer->m_mouseMiddlePressed = false;
-        }
+  SmallRenderer* renderer = static_cast<SmallRenderer*>(glfwGetWindowUserPointer(window));
+  if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
+    if (action == GLFW_PRESS) {
+      renderer->m_mouseMiddlePressed = true;
+      double xpos, ypos;
+      glfwGetCursorPos(window, &xpos, &ypos);
+      renderer->m_lastMousePos = glm::vec2(xpos, ypos);
+    } else if (action == GLFW_RELEASE) {
+      renderer->m_mouseMiddlePressed = false;
     }
+  }
 }
 
 // Cursor position callback
 void SmallRenderer::cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
-    SmallRenderer* renderer = static_cast<SmallRenderer*>(glfwGetWindowUserPointer(window));
-    if (renderer->m_mouseMiddlePressed) {
-        glm::vec2 currentPos(xpos, ypos);
-        glm::vec2 delta = currentPos - renderer->m_lastMousePos;
-        renderer->m_lastMousePos = currentPos;
+  SmallRenderer* renderer = static_cast<SmallRenderer*>(glfwGetWindowUserPointer(window));
+  if (renderer->m_mouseMiddlePressed) {
+    glm::vec2 currentPos(xpos, ypos);
+    glm::vec2 delta = currentPos - renderer->m_lastMousePos;
+    renderer->m_lastMousePos = currentPos;
 
-        // Rotate the camera based on mouse movement
-        renderer->m_camera.processMouseMovement(delta.x, -delta.y); // Invert y to match screen coordinates
-    }
+    // Rotate the camera based on mouse movement
+    renderer->m_camera.processMouseMovement(delta.x, -delta.y); // Invert y to match screen coordinates
+  }
+}
+
+void SmallRenderer::framebuffer_size_callback(GLFWwindow *window, int width, int height) {
+  SmallRenderer* renderer = static_cast<SmallRenderer*>(glfwGetWindowUserPointer(window));
+  // make sure the viewport matches the new window dimensions; note that width and 
+  // height will be significantly larger than specified on retina displays.
+  glViewport(0, 0, width, height);
+  renderer->m_height = height;
+  renderer->m_width = width;
+  // Re-render the scene because the current frame was drawn for the old resolution
+  renderer->render();
 }
