@@ -1,9 +1,7 @@
 # Directories
 /.git
 /build
-/dependencies/glew
-/dependencies/glfw
-/dependencies/glm
+/dependencies/
 
 # Files
 *.mkv
@@ -18,3 +16,6 @@
 *.*~
 *.*#
 *.#*
+
+# compile comands for language server
+src/compile_commands.json
