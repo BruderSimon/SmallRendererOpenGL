@@ -4,6 +4,8 @@
 /dependencies/glew
 /dependencies/glfw
 /dependencies/glm
+/dependencies/imgui
+
 
 # Files
 *.mkv
@@ -18,3 +20,6 @@
 *.*~
 *.*#
 *.#*
+
+# compile comands for language server
+src/compile_commands.json

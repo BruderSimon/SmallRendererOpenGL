@@ -4,12 +4,16 @@
 #include "glfw3.h"
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
 #include <cstddef>
 #include <cstring>
 #include <iostream>
 #include <stdexcept>
 
-void SmallRenderer::init(std::string& model, std::string mtl){
+void SmallRenderer::init(std::string &model, std::string mtl) {
   initWindow();
   loadScene(model);
   initShader();
@@ -37,7 +41,15 @@ void SmallRenderer::initWindow(){
     glfwTerminate();
     throw std::runtime_error("Failed to initialize GLEW");
   }
-
+  // Initialize ImGui
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+  ImGuiIO& io = ImGui::GetIO();
+  io.ConfigFlags |=
+    ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+  ImGui_ImplGlfw_InitForOpenGL(m_window, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
+  ImGui_ImplOpenGL3_Init();
+  
   // Ensure we can capture keys
   glfwSetInputMode(m_window, GLFW_STICKY_KEYS, GL_TRUE);
   glClearColor(0.0f, 0.1f, 0.3f, 0.0f);
@@ -62,8 +74,14 @@ void SmallRenderer::loadScene(std::string &path) {
 }
 void SmallRenderer::run(){
   double lastTime = glfwGetTime();
-  while(glfwGetKey(m_window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
-	glfwWindowShouldClose(m_window) == 0 ){
+  while (glfwGetKey(m_window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
+         glfwWindowShouldClose(m_window) == 0) {
+    glfwPollEvents();
+    // Start the Dear ImGui frame
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+    
     // Calculate delta time
     double currentTime = glfwGetTime();
     float deltaTime = static_cast<float>(currentTime - lastTime);
@@ -85,12 +103,16 @@ void SmallRenderer::run(){
 
     //Render Scene
     render();
+
+    // Swap buffers
+    glfwSwapBuffers(m_window);
   }
   cleanUp();
-} 
+}
 
 
 void SmallRenderer::render() {
+  ImGui::Render();
   // Clear the screen
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -145,9 +167,7 @@ void SmallRenderer::render() {
     glDrawElements(GL_TRIANGLES, obj.numIndices, GL_UNSIGNED_INT, 0);
     checkGLError("glDrawElements");
   }
-  // Swap buffers
-  glfwSwapBuffers(m_window);
-  glfwPollEvents();
+  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 void SmallRenderer::initShader(){
@@ -160,11 +180,14 @@ void SmallRenderer::initShader(){
    v  * Function to:
    * - free memory
    * - terminate glfw
+   * - shutdown imgui
    */
 void SmallRenderer::cleanUp() {
   for (auto object : m_sceneObjects)
     glDeleteVertexArrays(1, &object.vao);
-    
+  ImGui_ImplOpenGL3_Shutdown();
+  ImGui_ImplGlfw_Shutdown();
+ ImGui::DestroyContext();  
   glDeleteProgram(m_shaderProgram);
   glfwTerminate();
 }

@@ -41,50 +41,15 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Packages 
 find_package(OpenGL REQUIRED)
-include(FetchContent)
-
-# FetchContent
-FetchContent_Declare(
-  glew
-  URL                         https://github.com/nigels-com/glew/releases/download/glew-2.2.0/glew-2.2.0.zip
-  SOURCE_DIR                  ${CMAKE_SOURCE_DIR}/dependencies/glew
-  DOWNLOAD_EXTRACT_TIMESTAMP  TRUE
-)
-FetchContent_Declare(
-  glm
-  GIT_REPOSITORY	https://github.com/g-truc/glm.git
-  GIT_TAG 	        0af55ccecd98d4e5a8d1fad7de25ba429d60e863 # 1.0.1
-  SOURCE_DIR            ${CMAKE_SOURCE_DIR}/dependencies/glm
-)
-FetchContent_Declare(
-  glfw
-  GIT_REPOSITORY        https://github.com/glfw/glfw.git
-  GIT_TAG               7b6aead9fb88b3623e3b3725ebb42670cbe4c579 # 3.4
-  SOURCE_DIR            ${CMAKE_SOURCE_DIR}/dependencies/glfw
-)
-
-set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-
-add_definitions(
-	-DTW_STATIC
-	-DTW_NO_LIB_PRAGMA
-	-DTW_NO_DIRECT3D
-	-DGLEW_STATIC
-	-D_CRT_SECURE_NO_WARNINGS
-	-DGLEW_NO_GLU	
-)
-
-FetchContent_MakeAvailable(glew)
-FetchContent_MakeAvailable(glm)
-FetchContent_MakeAvailable(glfw)
 
 add_subdirectory(dependencies)
+
 include_directories(
   dependencies/glm/
   dependencies/glfw/include/GLFW/
   dependencies/glew/include/
+  dependencies/imgui/
+  dependencies/imgui/backends/
 )
 
 set(ALL_LIBS
@@ -92,6 +57,7 @@ set(ALL_LIBS
   GLEW_220
   glfw
   glm::glm
+  imgui
 )
 
 add_executable(SmallRendererOpenGL
@@ -107,6 +73,15 @@ add_executable(SmallRendererOpenGL
 )
 
 target_link_libraries(SmallRendererOpenGL ${ALL_LIBS})
+
+# To Copy the Compile Commands in the source directory
+add_custom_command(
+  TARGET SmallRendererOpenGL
+  POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy
+  "${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/compile_commands.json"
+)
 
 #Copy the Executabel
 add_custom_command(
