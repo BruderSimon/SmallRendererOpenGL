@@ -1,7 +1,7 @@
 # Directories
 /.git
 /build
-/dependencies/
+/dependencies/*
 
 # Files
 *.mkv
@@ -19,3 +19,6 @@
 
 # compile comands for language server
 src/compile_commands.json
+
+#Include CMakeLists for dependencies
+!/dependencies/CMakeLists.txt
